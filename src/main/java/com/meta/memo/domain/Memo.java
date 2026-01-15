@@ -4,6 +4,7 @@ import com.meta.memo.dto.MemoRequestDto;
 import com.meta.memo.dto.MemoResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Getter
@@ -19,9 +20,10 @@ public class Memo {
     this.contents = memoRequestDto.getContents();
   }
 
-  public Memo(MemoResponseDto memoResponseDto){
-    this.username = memoResponseDto.getUsername();
-    this.contents = memoResponseDto.getContents();
+
+  public void update(MemoRequestDto memoRequestDto){
+    this.username = memoRequestDto.getUsername();
+    this.contents = memoRequestDto.getContents();
   }
 
 }
