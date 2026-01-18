@@ -1,4 +1,6 @@
+
 show databases;
+
 
 
 DROP DATABASE MVACADEMY;
@@ -81,7 +83,6 @@ insert into major values('m8', '앵귤러', '이차차');
 
 
 desc student;
-
 
 
 
@@ -199,11 +200,6 @@ select name, major_code from student where student_code = 's1';
 
 
 
-
-
-
-
-
 show tables;
 desc exam;
 
@@ -235,3 +231,71 @@ where s.major_code = m.major_code;
 
 
 
+
+
+-- 문제 1번
+create TABLE MANAGER(
+                        id BIGINT PRIMARY KEY,
+                        name varchar(100) NOT NULL,
+                        student_code varchar(100) NOT NULL,
+                        CONSTRAINT manager_fk_student_code
+                            FOREIGN KEY(student_code)
+                                REFERENCES STUDENT(student_code)
+);
+
+
+show tables;
+
+-- 문제 2번
+alter table MANAGER MODIFY id Int NOT NULL auto_increment;
+
+select * from MANAGER;
+
+-- 문제 3번
+INSERT into MANAGER (name, student_code) values ('managerA', 's1');
+INSERT into MANAGER (name, student_code) values ('managerA', 's2');
+INSERT into MANAGER (name, student_code) values ('managerA', 's3');
+INSERT into MANAGER (name, student_code) values ('managerA', 's4');
+INSERT into MANAGER (name, student_code) values ('managerA', 's5');
+
+INSERT into MANAGER (name, student_code) values ('managerB', 's6'),
+                                                ('managerB', 's7'),
+                                                ('managerB', 's8'),
+                                                ('managerB', 's9');
+
+
+select * from MANAGER;
+
+-- 문제 4번
+select s.name, t.exam_seq, t.score
+from MANAGER m
+         JOIN student s
+              ON m.student_code = s.student_code
+         JOIN exam t
+              ON s.student_code = t.student_code
+where m.name = 'managerA';
+
+-- 문제 5번
+alter table exam
+DROP FOREIGN KEY exam_fk_student_code;
+
+alter table exam ADD CONSTRAINT exam_fk_student_code
+    FOREIGN KEY (student_code)
+        REFERENCES student (student_code)
+        ON DELETE CASCADE;
+
+alter table MANAGER
+Drop FOREIGN KEY manager_fk_student_code;
+
+
+alter table MANAGER
+    ADD CONSTRAINT manager_fk_student_code
+        FOREIGN KEY (student_code)
+            REFERENCES student(student_code)
+            ON DELETE CASCADE;
+
+
+select * from student where student_code = 's1';
+DELETE from student where student_code = 's1';
+select * from exam where student_code = 's1';
+select * from MANAGER where student_code = 's1';
