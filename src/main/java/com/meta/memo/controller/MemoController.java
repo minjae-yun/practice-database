@@ -69,31 +69,52 @@ public class MemoController {
         return memoResponseDtoList;
     }
 
+    //특정 id의 메모 존재 여부 확인 공용 메서드
+    private Memo findByID(Long id){
+        // DB 조회
+        String sql = "SELECT * FROM memo where id = ?";
+
+        return jdbcTemplate.query(sql, resultSet -> {
+            if (resultSet.next()) {
+                Memo memo = new Memo();
+                memo.setUsername(resultSet.getString("username"));
+                memo.setContents(resultSet.getString("contents"));
+                return memo;
+            } else{
+                throw new IllegalArgumentException("선택한 id의 메모는 존재하지 않습니다.");
+            }
+        }, id);
+
+
+    }
+
     @PutMapping("{id}")
     public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto) {
-        // 해당 id의 메모가 데이터베이스에 존재하는지 확인
-        if (memoList.containsKey(id)){
-            // true면, 해당 메모 가져오기
-            Memo foundMemo = memoList.get(id);
+        // 해당 id의 메모가 존재하는지 확인
+        Memo foundMemo = findByID(id);
+        // 해당 내용 수정
+        if (foundMemo != null){
+            String sql = "UPDATE memo SET username = ?, contents = ? Where id = ?";
+            jdbcTemplate.update (sql, memoRequestDto.getUsername(), memoRequestDto.getContents(), id);
 
-
-            foundMemo.update(memoRequestDto);
-            return foundMemo.getId();
-        } else{
-            throw new IllegalArgumentException("선택한 id의 메모는 존재하지 않습니다.");
+            return id;
+        }else {
+            throw new IllegalArgumentException("선택한 id의 메모는 존재하징 않습니다.");
         }
     }
 
     @DeleteMapping("{id}")
     public Long deleteMemo(@PathVariable Long id){
-        // 해당 id의 메모가 데이터베이스에 존재하는 확인
-        if (memoList.containsKey(id)){
-            // true면, 해당 메모 삭제
-            memoList.remove(id);
-            return id;
-        }
-        else{
-            throw new IllegalArgumentException("선택한 id의 메모는 존재하지 않습니다.");
-        }
+            Memo foundMemo = findByID(id);
+            // 해당 내용 수정
+            if (foundMemo != null) {
+                String sql = "DELETE FROM memo WHERE id = ?";
+                jdbcTemplate.update(sql, id);
+
+                return id;
+            } else {
+                throw new IllegalArgumentException("선택한 id의 메모는 존재하징 않습니다.");
+            }
     }
 }
+
