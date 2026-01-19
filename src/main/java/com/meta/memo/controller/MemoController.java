@@ -23,34 +23,31 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/memos")
 public class MemoController {
-    // JDBC를 통한 Mysql 데이터 베이스 연결
-    private final JdbcTemplate jdbcTemplate;
+    // 멤버 변수 선언
+    private final MemoService memoService;
 
+    //생성자 주입(DI)
     public MemoController(JdbcTemplate jdbcTemplate){
-        this.jdbcTemplate = jdbcTemplate;
+        this.memoService = new MemoService(jdbcTemplate);
     }
 
     @PostMapping()
     public MemoResponseDto createMemo(@RequestBody MemoRequestDto memoRequestDto) {
-        MemoService memoService = new MemoService(jdbcTemplate); // 전달해주기 위해서
         return memoService.createMemo(memoRequestDto);
     }
 
     @GetMapping()
     public List<MemoResponseDto> getMemos(){
-        MemoService memoService = new MemoService(jdbcTemplate);
         return memoService.getMemos();
     }
 
     @PutMapping("{id}")
     public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto) {
-        MemoService memoService = new MemoService(jdbcTemplate);
         return memoService.updateMemo(id, memoRequestDto);
     }
 
     @DeleteMapping("{id}")
     public Long deleteMemo(@PathVariable Long id){
-        MemoService memoService = new MemoService(jdbcTemplate);
         return memoService.deleteMemo(id);
     }
 }
