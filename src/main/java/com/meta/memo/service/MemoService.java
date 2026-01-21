@@ -1,4 +1,53 @@
 package com.meta.memo.service;
 
+import com.meta.memo.domain.Memo;
+import com.meta.memo.dto.MemoRequestDto;
+import com.meta.memo.dto.MemoResponseDto;
+import com.meta.memo.repository.MemoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional(readOnly = true)
 public class MemoService {
+
+  private final MemoRepository memoRepository;
+
+  public MemoService(MemoRepository memoRepository) {
+    this.memoRepository = memoRepository;
+  }
+
+  @Transactional
+  public MemoResponseDto createMemo(MemoRequestDto memoRequestDto) {
+    Memo newMemo = new Memo(memoRequestDto);
+    Memo savedMemo = memoRepository.save(newMemo);
+    return new MemoResponseDto(savedMemo);
+  }
+
+  public Memo getMemoById(Long id) {
+    return memoRepository.findById(id).orElseThrow(() ->
+        new IllegalArgumentException("선택한 id의 메모는 존재하지 않습니다."));
+  }
+
+  public List<MemoResponseDto> getMemos() {
+    return memoRepository.findAllByOrderByCreatedAtDesc().stream()
+        .map(MemoResponseDto::new)
+        .toList();
+  }
+
+  @Transactional
+  public Long updateMemo(Long id, MemoRequestDto memoRequestDto) {
+    Memo foundMemo = getMemoById(id);
+    foundMemo.update(memoRequestDto);
+    return id;
+  }
+
+  @Transactional
+  public Long deleteMemo(Long id) {
+    Memo foundMemo = getMemoById(id);
+    memoRepository.delete(foundMemo);
+    return id;
+  }
 }
