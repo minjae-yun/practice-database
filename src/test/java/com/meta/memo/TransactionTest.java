@@ -49,6 +49,6 @@ public class TransactionTest {
   @Rollback(value = false)
   @DisplayName("트랜잭션 전파 테스트")
   void test3(){
-    memoRepository.
+
   }
 }
