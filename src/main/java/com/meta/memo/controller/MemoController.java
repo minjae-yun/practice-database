@@ -1,26 +1,10 @@
 package com.meta.memo.controller;
-
-
-import com.meta.memo.domain.Memo;
 import com.meta.memo.dto.MemoRequestDto;
 import com.meta.memo.dto.MemoResponseDto;
 import com.meta.memo.service.MemoService;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("api/memos")
@@ -42,6 +26,11 @@ public class MemoController {
     @GetMapping()
     public List<MemoResponseDto> getMemos(){
         return memoService.getMemos();
+    }
+
+    @GetMapping("/contents")
+    public List<MemoResponseDto> getMemosByKeyword(@RequestParam String keyword){
+        return memoService.getMemosByKeyword(keyword);
     }
 
     @PutMapping("{id}")
