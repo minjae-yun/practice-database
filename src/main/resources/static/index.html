@@ -204,6 +204,70 @@
       #cards-box {
           margin-top: 12px;
       }
+      .area-search{
+          width: 538px;
+          margin: 0 auto 16px;
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+      }
+      .search-box input {
+          width: 260px;
+          height: 50px;
+          border: none;
+          padding: 0 14px;
+      }
+
+      .search-box button {
+          height: 50px;
+          border-radius: 6px;
+          border: none;
+          padding: 0 12px;
+          cursor: pointer;
+      }
+      .header {
+          position: relative;
+      }
+
+
+      .header-img {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 120px;
+          opacity: 0.9;
+      }
+
+
+      .header-img.left {
+          left: 30px;
+      }
+
+
+      .header-img.right {
+          right: 30px;
+      }
+      .fab-top{
+          position: fixed;
+          right: 24px;
+          bottom: 40px;
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: #5b5fdc;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          z-index: 9999;
+      }
+
+      .fab-top:hover{
+          opacity: 0.9;
+          color: blue;
+      }
+
   </style>
   <script>
       // 사용자가 내용을 올바르게 입력하였는지 확인합니다.
@@ -375,6 +439,57 @@
               }
           })
       }
+
+      // 메모 검색 (contents에 keyword 포함 + 수정시간 내림차순)
+      function searchMemos() {
+          const keyword = $('#keyword').val().trim();
+
+          if (keyword === '') {
+              alert('검색어를 입력해주세요');
+              return;
+          }
+
+          // 1) 기존 목록 비우기 (검색 결과로 덮어쓰기)
+          $('#cards-box').empty();
+
+          // 2) 검색 API 호출
+          $.ajax({
+              type: 'GET',
+              url: `/api/memos/contents?keyword=${encodeURIComponent(keyword)}`,
+              success: function (response) {
+                  // 3) 검색 결과 렌더링 (기존 addHTML 재사용)
+                  for (let i = 0; i < response.length; i++) {
+                      const message = response[i];
+                      addHTML(message['id'], message['username'], message['contents'], message['modifiedAt']);
+                  }
+
+                  // 검색 결과 없을 때(선택)
+                  if (response.length === 0) {
+                      $('#cards-box').append(`<div style="padding:15px; color:#666;">검색 결과가 없습니다.</div>`);
+                  }
+              },
+              error: function () {
+                  alert('검색 요청 실패: 서버 실행/URL을 확인하세요');
+              }
+          });
+      }
+
+      // 위로 천천히 올라가는 버튼
+      document.addEventListener("DOMContentLoaded", () => {
+          const topBtn = document.querySelector(".fab-top");
+
+          if (!topBtn) return;
+
+          topBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              window.scrollTo({
+                  top: 0,
+                  behavior: "smooth"
+              });
+          });
+      });
+
+
   </script>
 </head>
 
@@ -387,12 +502,24 @@
 </div>
 <div class="wrap">
   <div class="header">
+    <a class="fab-top" href="#myPage" title="To Top">▲</a>
+      <img src="https://media.bunjang.co.kr/product/348900484_1_1754328284_w360.jpg" class="header-img left">
+
     <h2>Memo</h2>
     <p>
-      공유하고 싶은 소식을 입력해주세요.
+      야구와 관련된 소식을 입력해주세요
     </p>
+      <img src="https://media.bunjang.co.kr/product/348900484_1_1754328284_w360.jpg" class="header-img right">
+
   </div>
   <div class="area-write">
+    <div class = "area-search">
+      <input id = "keyword" class = "search-input" type = "text" placeholder="검색어를 입력해주세요">
+      <div class = "search-buttons">
+        <button class = "search-btn" onclick="searchMemos()">검색</button>
+        <button class = "search-btn" onclick="getMessages()">새로고침</button>
+      </div>
+    </div>
         <textarea class="field" placeholder="공유하고 싶은 소식을 입력해주세요" name="contents" id="contents" cols="30"
                   rows="10"></textarea>
     <!--            <button class="btn btn-danger" onclick="writePost()">작성하기</button>-->
